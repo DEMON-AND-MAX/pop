@@ -30,18 +30,19 @@ def parse(text: str):
 
     # parse lines and generate uuid on the go
     for line, uuid in zip(lines, count()):
+        uuid = str(uuid)
         line_type = _get_line_type(line)
         match line_type:
             case "tag":
                 # always yield a dict
                 tag, *args = _split_line(line)
-                yield process_tag(tag, [str(uuid), *args]), line_type, tag
+                yield process_tag(tag, [uuid, *args]), (line_type, uuid, tag)
             case "content":
                 # always yield a string
-                yield line, line_type
+                yield line, (line_type, uuid)
             case "newline":
                 # always yield a string `\n`
-                yield "\n", line_type
+                yield "\n", (line_type, uuid)
             case "comment":
                 # skip comment line
                 continue
