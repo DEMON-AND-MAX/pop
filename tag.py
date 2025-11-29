@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 SCHEMA = {
     "tag": "",
     "uuid": "",
@@ -30,7 +32,7 @@ def _apply_args(args: list[str], schema:dict, args_index: dict) -> dict:
 
 def process_tag(tag: str, args: list[str]):
     # object based on the schema
-    obj = _apply_args([tag, *args], SCHEMA, ARGS_INDEX)
+    obj = _apply_args([tag, *args], deepcopy(SCHEMA), ARGS_INDEX)
 
     return obj
 

@@ -1,18 +1,32 @@
 from parser import parse
 
+def _apply_child(data: dict, obj_uuid: str, child_uuid: str):
+    """
+    for the data dictionary, apply `child_uuid` to the `children` field of object `obj_uuid`
+    """
+    obj = data.get(obj_uuid)
+
+    if not obj:
+        raise ValueError(f"[processor.py] object {obj_uuid} not found in data.")
+    if "children" not in obj:
+        raise ValueError(f"[processor.py] object {obj_uuid} has no `children` field.")
+    
+    obj["children"].append(child_uuid)
+
 
 def _process_text(text: str) -> dict:
     data = {}
     stack = []
     for obj, meta in parse(text):
         tag_type, uuid, *rest = meta
-        data[uuid] = obj
-        # placeholder stack logic
         if tag_type == "tag":
-            stack.pop() if stack else None
+            data[uuid] = obj
             stack.append(uuid)
-        elif tag_type in ["newline", "content"] and stack:
-            data[stack[-1]]["children"].append(uuid)
+        elif tag_type == "content":
+            if not stack:
+                raise ValueError(f"[processor.py] no parent tag available for content/newline with uuid {uuid}.")
+            data[uuid] = obj
+            _apply_child(data, stack[-1], uuid)
     
     return data
 
