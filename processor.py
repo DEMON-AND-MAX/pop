@@ -1,23 +1,7 @@
 from parser import parse
 import schema
 from stack import PopulatorStack
-
-
-def _apply_child(data: dict, obj_uuid: str, child_uuid: str):
-    """
-    for the data dictionary, apply `child_uuid` to the `children` field of object `obj_uuid`
-    """
-    if obj_uuid == "root":
-        return
-    
-    obj = data.get(obj_uuid)
-
-    if not obj:
-        raise ValueError(f"[processor.py] object {obj_uuid} not found in data.")
-    if "children" not in obj:
-        raise ValueError(f"[processor.py] object {obj_uuid} has no `children` field.")
-    
-    obj["children"].append(child_uuid)
+from populator import PopulatorData
 
 
 def _get_level_from_tag(tag: str) -> str:
@@ -25,33 +9,41 @@ def _get_level_from_tag(tag: str) -> str:
 
 
 def _process_text(text: str) -> dict:
-    data = {}
+    data = PopulatorData()
     stack = PopulatorStack(
         push_schema=schema.level_to_level(),
     )
     for obj, meta in parse(text):
         tag_type, uuid, *rest = meta
+
         if tag_type == "tag":
-            data[uuid] = obj
+            data.add(obj, uuid)
             level = _get_level_from_tag(obj["tag"])
+
             for q in stack.push((uuid, level)):
                 q_uuid, _ = q
-                _apply_child(data, stack.peek_uuid(), q_uuid)
+                p_uuid = stack.peek_uuid()
+                if p_uuid == "root": break # stop at root
+                data.apply_child(p_uuid, q_uuid)
+
         elif tag_type == "content":
             if stack.is_empty():
                 raise ValueError(f"[processor.py] no parent tag available for content/newline with uuid {uuid}.")
-            _apply_child(data, stack.peek_uuid(), obj)
+            data.apply_content(stack.peek_uuid(), obj)
+
         elif tag_type == "newline":
             if stack.is_empty():
                 continue  # skip newlines outside of any tagobj
-            _apply_child(data, stack.peek_uuid(), obj)
+            data.apply_content(stack.peek_uuid(), obj)
 
     # clear the stack and route remaining items
     for q in stack.clear():
         q_uuid, _ = q
-        _apply_child(data, stack.peek_uuid(), q_uuid)
+        p_uuid = stack.peek_uuid()
+        if p_uuid == "root": break  # stop at root
+        data.apply_child(p_uuid, q_uuid)
 
-    return data
+    return data.to_dict()
 
 
 if __name__ == "__main__":
