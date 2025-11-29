@@ -23,20 +23,27 @@
     },
     "objects": {
         "root": {
-            "description": "Ground container of the render schema."
+            "description": "Ground container of the render schema.",
+            "has_content": []
         },
         "page": {
-            "description": "Container grouping objects into front-end of render."
+            "description": "Container grouping objects into front-end of render.",
+            "has_content": ["uuid"]
         },
         "section": {
-            "description": "Logical grouping of content."
+            "description": "Logical grouping of content.",
+            "has_content": ["uuid"]
         },
         "text": {
             "description": "Text content object.",
-            "can_contain": ["txt", "/n"]
+            "has_content": ["txt", "/n"]
         }
     },
     "content": {
+        "id": {
+            "description": "Unique identifier for objects.",
+            "form": "{uuid}"
+        },
         "\n": {
             "description": "Newline character.",
             "form": "\n"
