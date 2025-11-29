@@ -1,0 +1,44 @@
+{
+    "levels": {
+        "lvl0": {
+            "description": "Root level container.",
+            "can_contain": ["lvl1"],
+            "objects": ["root"]
+        },
+        "lvl1": {
+            "description": "Descriptor grouping level.",
+            "can_contain": ["lvl2"],
+            "objects": ["page"]
+        },
+        "lvl2": {
+            "description": "Splitter for grouping data logically.",
+            "can_contain": ["lvl3"],
+            "objects": ["section"]
+        },
+        "lvl3": {
+            "description": "Containing actual content.",
+            "can_contain": [],
+            "objects": ["text"]
+        }
+    },
+    "objects": {
+        "root": {
+            "description": "Ground container of the render schema."
+        },
+        "page": {
+            "description": "Container grouping objects into front-end of render."
+        },
+        "section": {
+            "description": "Logical grouping of content."
+        },
+        "text": {
+            "description": "Text content object.",
+            "can_contain": ["txt"]
+        }
+    },
+    "content": {
+        "txt": {
+            "description": "Plain text content."
+        }
+    }
+}
