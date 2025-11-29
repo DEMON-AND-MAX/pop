@@ -2,11 +2,13 @@ from itertools import count
 
 from tag import process_tag
 
-def _sanitize_and_split(text: str) -> list[str]:
+# sanitize raw text into separate lines
+def _sanitize_text(text: str) -> list[str]:
     lines = text.splitlines()
     sanitized_lines = [line.strip() for line in lines]
     return sanitized_lines
 
+# determine the type of line
 def _get_line_type(line: str) -> str:
     if line.startswith("[") and line.endswith("]"):
         return "tag"
@@ -17,6 +19,7 @@ def _get_line_type(line: str) -> str:
     
     return "content"
 
+# split tag line into components
 def _split_line(line: str) -> list[str]:
     # remove the square brackets
     tag_content = line[1:-1].strip()
@@ -26,22 +29,27 @@ def _split_line(line: str) -> list[str]:
 
 # iterate through each line and yield processed objects
 def parse(text: str):
-    lines = _sanitize_and_split(text)
+    """
+    parse the input text and receive processed objects
+    yield: (object, metadata)
+    """
+    lines = _sanitize_text(text)
 
     # parse lines and generate uuid on the go
     for line, uuid in zip(lines, count()):
+        uuid = str(uuid)
         line_type = _get_line_type(line)
         match line_type:
             case "tag":
                 # always yield a dict
                 tag, *args = _split_line(line)
-                yield process_tag(tag, [str(uuid), *args]), line_type, tag
+                yield process_tag(tag, [uuid, *args]), (line_type, uuid, tag)
             case "content":
                 # always yield a string
-                yield line, line_type
+                yield line, (line_type, uuid)
             case "newline":
                 # always yield a string `\n`
-                yield "\n", line_type
+                yield "\n", (line_type, uuid)
             case "comment":
                 # skip comment line
                 continue
