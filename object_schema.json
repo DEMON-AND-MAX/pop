@@ -2,23 +2,23 @@
     "levels": {
         "lvl0": {
             "description": "Root level container.",
-            "can_contain": ["lvl1"],
-            "objects": ["root"]
+            "child_levels": ["lvl1"],
+            "is_objects": ["root"]
         },
         "lvl1": {
             "description": "Descriptor grouping level.",
-            "can_contain": ["lvl2"],
-            "objects": ["page"]
+            "child_levels": ["lvl2"],
+            "is_objects": ["page"]
         },
         "lvl2": {
             "description": "Splitter for grouping data logically.",
-            "can_contain": ["lvl3"],
-            "objects": ["section"]
+            "child_levels": ["lvl3"],
+            "is_objects": ["section"]
         },
         "lvl3": {
             "description": "Containing actual content.",
-            "can_contain": [],
-            "objects": ["text"]
+            "child_levels": [],
+            "is_objects": ["text"]
         }
     },
     "objects": {
@@ -33,12 +33,17 @@
         },
         "text": {
             "description": "Text content object.",
-            "can_contain": ["txt"]
+            "can_contain": ["txt", "/n"]
         }
     },
     "content": {
+        "\n": {
+            "description": "Newline character.",
+            "form": "\n"
+        },
         "txt": {
-            "description": "Plain text content."
+            "description": "Plain text content.",
+            "form": "{text}"
         }
     }
 }

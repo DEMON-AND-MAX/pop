@@ -29,10 +29,9 @@ class PopulatorStack:
             self.uuid = uuid
             self.level = level
 
-    def __init__(self, push_schema: dict, pop_schema: dict):
+    def __init__(self, push_schema: dict):
         self._stack = self._init_stack()
         self._push_schema = self._validate_schema(push_schema)
-        self._pop_schema = self._validate_schema(pop_schema)
     
     def _init_stack(self) -> Stack:
         stack = Stack()
@@ -46,7 +45,10 @@ class PopulatorStack:
         return schema
 
     def _pop(self):
-        return self._stack.pop()
+        item = self._stack.pop()
+        if not item:
+            raise ValueError("[stack.py] cannot pop from empty stack.")
+        return item
 
     # always returns at least root
     def _peek(self) -> StackItem:
@@ -57,6 +59,20 @@ class PopulatorStack:
         if not top_item:
             raise ValueError("[stack.py] stack is empty, cannot peek level.")
         return top_item.level
+
+    def peek_uuid(self) -> str:
+        top_item = self._stack.peek()
+        if not top_item:
+            raise ValueError("[stack.py] stack is empty, cannot peek uuid.")
+        return top_item.uuid
+
+    def is_empty(self) -> bool:
+        return self._stack.size() <= 1  # only root remains
+
+    def clear(self):
+        while self._stack.size() > 1:  # keep root
+            popped_item = self._pop()
+            yield (popped_item.uuid, popped_item.level)
 
     def _can_push(self, level: str) -> bool:
         top_level = self._peek_level()
@@ -78,17 +94,18 @@ class PopulatorStack:
         if top_level == level:
             return True
         
-        allowed_pop_levels = self._pop_schema.get(top_level, None)
-        if not allowed_pop_levels:
-            raise ValueError(f"[stack.py] no pop schema defined for level {top_level}.")
+        allowed_push_levels = self._push_schema.get(top_level, None)
+        if not allowed_push_levels:
+            raise ValueError(f"[stack.py] no push schema defined for level {top_level}.")
         
-        return level in allowed_pop_levels
+        return not level in allowed_push_levels
     
     def push(self, item: tuple[str, str]):
         item = self.StackItem(*item)
 
         while self._should_pop(item.level):
-            yield (self._pop().uuid, self._pop().level)
+            popped_item = self._pop()
+            yield (popped_item.uuid, popped_item.level)
         
         if not self._can_push(item.level):
             raise ValueError(f"[stack.py] cannot push level {item.level} on top of {self._peek_level()}.")
