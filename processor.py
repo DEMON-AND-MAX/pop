@@ -1,4 +1,5 @@
 from parser import parse
+import schema
 from stack import PopulatorStack
 
 
@@ -20,22 +21,13 @@ def _apply_child(data: dict, obj_uuid: str, child_uuid: str):
 
 
 def _get_level_from_tag(tag: str) -> str:
-    SCHEMA_LEVELS = {
-        "root": "lvl0",
-        "div": "lvl1",
-        "span": "lvl2",
-        "p": "lvl2",
-        }
-    return SCHEMA_LEVELS.get(tag, None)
+    return schema.object_to_level(tag)
+
 
 def _process_text(text: str) -> dict:
     data = {}
     stack = PopulatorStack(
-        push_schema={
-            "lvl0": ["lvl1"],
-            "lvl1": ["lvl2"],
-            "lvl2": ["."],
-        },
+        push_schema=schema.level_to_level(),
     )
     for obj, meta in parse(text):
         tag_type, uuid, *rest = meta
@@ -68,17 +60,20 @@ if __name__ == "__main__":
     """
     sample_text = """
     // this is a comment
-    [div ref-001]
+    [page ref-001]
     
-    [span ref-002]
+    [section ref-002]
     // another comment
 
     12345 Some content here.
     67890 More content.
 
-    [p ref-003]
+    [text ref-003]
 
+    texty stuff here.
 
+    [text ref-004]
+    even more texty stuff.
     """
 
     data = _process_text(sample_text)
