@@ -8,7 +8,7 @@
         "lvl1": {
             "description": "Descriptor grouping level.",
             "child_levels": ["lvl2"],
-            "is_objects": ["page"]
+            "is_objects": ["page", "linkrr"]
         },
         "lvl2": {
             "description": "Splitter for grouping data logically.",
@@ -18,7 +18,7 @@
         "lvl3": {
             "description": "Containing actual content.",
             "child_levels": [],
-            "is_objects": ["text"]
+            "is_objects": ["text", "image", "link"]
         }
     },
     "objects": {
@@ -30,6 +30,10 @@
             "description": "Container grouping objects into front-end of render.",
             "has_content": ["uuid"]
         },
+        "linkrr": {
+            "description": "Container for linking media.",
+            "has_content": ["key-val"]
+        },
         "section": {
             "description": "Logical grouping of content.",
             "has_content": ["uuid"]
@@ -37,6 +41,14 @@
         "text": {
             "description": "Text content object.",
             "has_content": ["txt", "/n"]
+        },
+        "image": {
+            "description": "Image container.",
+            "has_content": []
+        },
+        "link": {
+            "description": "Link to another web-page.",
+            "has_content": []
         }
     },
     "content": {
@@ -51,6 +63,10 @@
         "txt": {
             "description": "Plain text content.",
             "form": "{text}"
+        },
+        "key-val": {
+            "description": "Key value pairs.",
+            "form": "your/key/here: value1"
         }
     }
 }
