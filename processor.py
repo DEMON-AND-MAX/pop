@@ -27,6 +27,11 @@ def _process_text(text: str) -> dict:
                 raise ValueError(f"[processor.py] no parent tag available for content/newline with uuid {uuid}.")
             data[uuid] = obj
             _apply_child(data, stack[-1], uuid)
+        elif tag_type == "newline":
+            if not stack:
+                continue  # skip newlines outside of any tag
+            data[uuid] = obj
+            _apply_child(data, stack[-1], uuid)
     
     return data
 
