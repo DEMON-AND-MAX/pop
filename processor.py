@@ -22,9 +22,6 @@ if __name__ == "__main__":
     [section ref-002]
     // another comment
 
-    12345 Some content here.
-    67890 More content.
-
     [text ref-003]
 
     texty stuff here.

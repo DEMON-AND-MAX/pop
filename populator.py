@@ -29,11 +29,15 @@ class Populator:
         elif tag_type == "content":
             if self._stack.is_empty():
                 raise ValueError(f"[processor.py] no parent tag available for content/newline with uuid {uuid}.")
+            if self._stack.peek_level() != "lvl3":
+                raise ValueError(f"[processor.py] can only append content to lvl3 tags.")
             self._data.apply_content(self._stack.peek_uuid(), object_)
 
         elif tag_type == "newline":
             if self._stack.is_empty():
                 return  # skip newlines outside of any tag object
+            if self._stack.peek_level() != "lvl3":
+                return # don't append newlines outside of lvl3 tags
             self._data.apply_content(self._stack.peek_uuid(), object_)
     
     def wrangle(self):

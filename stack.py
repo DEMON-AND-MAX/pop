@@ -54,7 +54,7 @@ class PopulatorStack:
     def _peek(self) -> StackItem:
         return self._stack.peek()
     
-    def _peek_level(self) -> str:
+    def peek_level(self) -> str:
         top_item = self._stack.peek()
         if not top_item:
             raise ValueError("[stack.py] stack is empty, cannot peek level.")
@@ -75,7 +75,7 @@ class PopulatorStack:
             yield (popped_item.uuid, popped_item.level)
 
     def _can_push(self, level: str) -> bool:
-        top_level = self._peek_level()
+        top_level = self.peek_level()
 
         # avoid recursion
         if top_level == level:
@@ -88,7 +88,7 @@ class PopulatorStack:
         return level in allowed_push_levels
     
     def _should_pop(self, level: str) -> bool:
-        top_level = self._peek_level()
+        top_level = self.peek_level()
 
         # can always pop if same level
         if top_level == level:
@@ -108,7 +108,7 @@ class PopulatorStack:
             yield (popped_item.uuid, popped_item.level)
         
         if not self._can_push(item.level):
-            raise ValueError(f"[stack.py] cannot push level {item.level} on top of {self._peek_level()}.")
+            raise ValueError(f"[stack.py] cannot push level {item.level} on top of {self.peek_level()}.")
 
         self._stack.push(item)
         return None
