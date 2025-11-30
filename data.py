@@ -16,13 +16,16 @@ class PopulatorData:
             self.content.append(content)
         
         def to_dict(self) -> dict:
-            return {
+            dict_ = {
                 "uuid": self.uuid,
                 "tag": self.tag,
                 "ref": self.ref,
-                "children": self.children,
-                "content": self.content,
             }
+            if self.children:
+                dict_["children"] = self.children
+            if self.content:
+                dict_["content"] = self.content
+            return dict_
 
     def __init__(self):
         self.data = {}
